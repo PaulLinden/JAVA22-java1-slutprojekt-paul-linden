@@ -9,25 +9,18 @@ import java.util.Scanner;
 
 public class RandomWord {
 
-	public static String word;
 
-	
 	public static String randomizer() throws FileNotFoundException {
 	
-	Scanner scanner = new Scanner(new File("C:\\Users\\linde\\OneDrive\\Skrivbord\\prova\\random.txt"));
+	Scanner scannerForRandomizer = new Scanner(new File("random.txt"));
 	
-	List<String> words = new ArrayList<>();
+	List<String> randomWords = new ArrayList<>();
 	
-	
-	while(scanner.hasNext()) {
-		words.add(scanner.nextLine());
+	while(scannerForRandomizer.hasNext()) {
+		randomWords.add(scannerForRandomizer.nextLine());
 	}
-		Random rand = new Random();
-		
-		String word = words.get(rand.nextInt(words.size()));
-		
-		System.out.println(word);
-		
+		Random random = new Random();
+		String word = randomWords.get(random.nextInt(randomWords.size()));
 		return word;
 	}
 	
