@@ -30,142 +30,156 @@ import randomWord.RandomWord;
 public class GUI {
 
 	public static void mainGui() {
+		//Frame for calendar
 		JFrame frame = new JFrame("Din Kalender");
 		frame.setBounds(0, 0, 1520, 800);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.setResizable(false);
 
-		String[] files = { "monday.txt", "tuesday.txt", "wednesday.txt", "thursday.txt", "friday.txt", "saturday.txt", "sunday.txt" };
-		String[] dayName = { "Måndag", "Tisdag", "Onsdag", "Torsdag", "Fredag", "Lördag", "Söndag" };
-		LocalDate[] dayOfWeek = { Date.monday, Date.tuesday, Date.wednesday, Date.thursday, Date.friday, Date.saturday,Date.sunday };
-		
-		
-		JPanel mainPanel = new JPanel();
+		String[] createFilenameForMemo = { "monday.txt", "tuesday.txt", "wednesday.txt", "thursday.txt", "friday.txt", "saturday.txt", "sunday.txt" };
+		String[] nameOfWeekday = { "Måndag", "Tisdag", "Onsdag", "Torsdag", "Fredag", "Lördag", "Söndag" };
+		LocalDate[] dateOfWeekday = { Date.mondayDate, Date.tuesdayDate, Date.wednesdayDate, Date.thursdayDate, Date.fridayDate, Date.saturdayDate,Date.sundayDate };
+	
+		//Main panel that will contain panels for weekdays.
+		JPanel mainPanelForCalendar = new JPanel();
 
+		//Loop which creates panels for each weekday.
 		for (int i = 0; i < 7; i++)
-			addGroupOfComponents(mainPanel, files[i], dayName[i], dayOfWeek[i]);
-
-		wordRandomizer(mainPanel);
-		frame.add(mainPanel);
+			addGroupOfComponentsForWeekdays(mainPanelForCalendar, createFilenameForMemo[i], nameOfWeekday[i], dateOfWeekday[i]);
+		//Adds word-randomizer to main panel.  
+		addGroupOfComponentsForWordRandomizer(mainPanelForCalendar);
+		
+		//Adds main panel to frame.
+		frame.add(mainPanelForCalendar);
 		frame.setVisible(true);
 	}
 
-	private static void addGroupOfComponents(JPanel container, String files, String dayName, LocalDate dayOfWeek) {
+	private static void addGroupOfComponentsForWeekdays(JPanel containerForWeekdays, String fileNames, String dayName, LocalDate dateOfWeekday) {
+		//Method that contains group of components for calendar.
+		JPanel panelForComponents = new JPanel();
+		panelForComponents.setLayout(new BoxLayout(panelForComponents, BoxLayout.PAGE_AXIS));
 
-		JPanel dayPanel = new JPanel();
-		dayPanel.setLayout(new BoxLayout(dayPanel, BoxLayout.PAGE_AXIS));
+		JLabel displayWeekdayName = new JLabel(dayName);
+		JLabel displayDateOfWeekday = new JLabel(dateOfWeekday.toString());
+		JButton buttonForAddFunctionToMemo = new JButton("Add+");
+		JTextField memoTextField = new JTextField("Skriv text..");
+		JTextArea memoTextArea = new JTextArea();
+		JScrollPane memoTextPane = new JScrollPane(memoTextArea);
 
-		JLabel weekday = new JLabel(dayName);
-		JLabel date = new JLabel(dayOfWeek.toString());
-		JButton button = new JButton("Add+");
-		JTextField textField = new JTextField("Skriv text..");
-		JTextArea textArea = new JTextArea();
-		JScrollPane textPane = new JScrollPane(textArea);
-
-		weekday.setFont(new Font("Verdana", Font.BOLD, 18));
-		date.setFont(new Font("Verdana", Font.PLAIN, 15));
-		textArea.setBorder(BorderFactory.createTitledBorder("Memo"));
-		dayPanel.setBackground(Color.lightGray);
-		textArea.setLineWrap(true);
-		textArea.setEditable(false);
-		textPane.setPreferredSize(new Dimension(180, 100));
-		textField.setPreferredSize(new Dimension(180, 50));
-
-		if (dayOfWeek == Date.day) {
-			dayPanel.setBackground(Color.GRAY);
+		//Layout for components
+		displayWeekdayName.setFont(new Font("Verdana", Font.BOLD, 18));
+		displayDateOfWeekday.setFont(new Font("Verdana", Font.PLAIN, 15));
+		memoTextArea.setBorder(BorderFactory.createTitledBorder("Memo"));
+		panelForComponents.setBackground(Color.lightGray);
+		memoTextArea.setLineWrap(true);
+		memoTextArea.setEditable(false);
+		memoTextPane.setPreferredSize(new Dimension(180, 100));
+		memoTextField.setPreferredSize(new Dimension(180, 50));
+		
+		//If statement that changes the background color of the current day.
+		if (dateOfWeekday == Date.todaysDate) {
+			panelForComponents.setBackground(Color.GRAY);
 		}
+		
+		//Adds components to panel and create space between.
+		panelForComponents.add(displayWeekdayName);
+		panelForComponents.add(Box.createRigidArea(new Dimension(0, 20)));
+		panelForComponents.add(displayDateOfWeekday);
+		panelForComponents.add(Box.createRigidArea(new Dimension(0, 350)));
+		panelForComponents.add(memoTextPane);
+		panelForComponents.add(Box.createRigidArea(new Dimension(0, 50)));
+		panelForComponents.add(memoTextField);
+		panelForComponents.add(Box.createRigidArea(new Dimension(0, 5)));
+		panelForComponents.add(buttonForAddFunctionToMemo);
+		panelForComponents.setVisible(true);
 
-		dayPanel.add(weekday);
-		dayPanel.add(Box.createRigidArea(new Dimension(0, 20)));
-		dayPanel.add(date);
-		dayPanel.add(Box.createRigidArea(new Dimension(0, 350)));
-		dayPanel.add(textPane);
-		dayPanel.add(Box.createRigidArea(new Dimension(0, 50)));
-		dayPanel.add(textField);
-		dayPanel.add(Box.createRigidArea(new Dimension(0, 5)));
-		dayPanel.add(button);
-		dayPanel.setVisible(true);
+		//Adds listener, writer and reader for memo in container.
+		addButtonListenerForMemo(buttonForAddFunctionToMemo, memoTextArea, memoTextField);
+		addTextWriterForMemo(buttonForAddFunctionToMemo, memoTextField, fileNames);
+		addTextReaderForMemo(memoTextArea, fileNames);
 
-		addButtonListener(button, textArea, textField);
-		addTextWriter(button, textField, files);
-		addTextReader(textArea, files);
-
-		container.add(dayPanel);
+		containerForWeekdays.add(panelForComponents);
 	}
 
-	private static void wordRandomizer(JPanel wordContainer) {
-		JPanel wordPanel = new JPanel();
+	private static void addGroupOfComponentsForWordRandomizer(JPanel containerWordRandomizer) {
+		
+		JPanel panelForRandomizer = new JPanel();
 		JLabel randomWord = new JLabel("Lär dig ett ord!");
-		JButton randomizer = new JButton("Tryck här!");
+		JButton buttonForWordRandomizer = new JButton("Tryck här!");
 		
-		wordPanel.setLayout(new BoxLayout(wordPanel, BoxLayout.PAGE_AXIS));
+		//Layout for components.
+		panelForRandomizer.setLayout(new BoxLayout(panelForRandomizer, BoxLayout.PAGE_AXIS));
 		randomWord.setPreferredSize(new Dimension(180, 50));
-		randomizer.setPreferredSize(new Dimension(180, 200));
+		buttonForWordRandomizer.setPreferredSize(new Dimension(180, 200));
 		
-		wordPanel.add(Box.createRigidArea(new Dimension(0, 20)));
-		wordPanel.add(randomizer);
-		wordPanel.add(Box.createRigidArea(new Dimension(0, 20)));
-		wordPanel.add(randomWord);
+		panelForRandomizer.add(Box.createRigidArea(new Dimension(0, 20)));
+		panelForRandomizer.add(buttonForWordRandomizer);
+		panelForRandomizer.add(Box.createRigidArea(new Dimension(0, 20)));
+		panelForRandomizer.add(randomWord);
 		
-		addButtonListenerRand(randomizer, randomWord);
+		addButtonListenerForRandomizer(buttonForWordRandomizer, randomWord);
 		
-		wordContainer.add(wordPanel);
+		containerWordRandomizer.add(panelForRandomizer);
 	}
 	
-	private static void addButtonListener(JButton button, JTextArea textArea, JTextField textField) {
+	private static void addButtonListenerForMemo(JButton addMemoButton, JTextArea textAreaForMemo, JTextField textFieldMemo) {
 		ActionListener buttonListener = new ActionListener() {
 
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				textArea.setText(textField.getText());
-				textField.setText("Skriv igen");
+				textAreaForMemo.setText(textFieldMemo.getText());
+				textFieldMemo.setText("Skriv igen");
 			}
 		};
-		button.addActionListener(buttonListener);
+		addMemoButton.addActionListener(buttonListener);
 	}
 
-	private static void addTextWriter(JButton button, JTextField textField, String files) {
+	private static void addTextWriterForMemo(JButton addMemoButton, JTextField textFieldMemo, String fileName) {
 		ActionListener buttonListener = new ActionListener() {
 
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				try {
-					BufferedWriter output = new BufferedWriter(new FileWriter(files));
-					output.write(textField.getText());
-					output.close();
+					BufferedWriter memoWriter = new BufferedWriter(new FileWriter(fileName));
+					memoWriter.write(textFieldMemo.getText());
+					memoWriter.close();
 					System.out.println("File Written Successfully");
 				} catch (Exception a) {
 					a.getStackTrace();
 				}
 			}
 		};
-		button.addActionListener(buttonListener);
+		addMemoButton.addActionListener(buttonListener);
 	}
 
-	private static void addTextReader(JTextArea textArea, String files) {
+	private static void addTextReaderForMemo(JTextArea textAreaForMemo, String fileName) {
 
 		try {
-			BufferedReader reader = new BufferedReader(new FileReader(files));
+			BufferedReader memoTextReader = new BufferedReader(new FileReader(fileName));
 			String memo;
-			memo = reader.readLine();
-			reader.close();
-			textArea.setText(memo);
+			memo = memoTextReader.readLine();
+			memoTextReader.close();
+			textAreaForMemo.setText(memo);
 			System.out.println("File read Successfully.");
 		} catch (Exception e) {
 			e.getStackTrace();
 		}
 	}
 
-	private static void addButtonListenerRand(JButton random, JLabel randomWord) {
-		ActionListener randomListener = new ActionListener() {
+	private static void addButtonListenerForRandomizer(JButton buttonForRandomizer, JLabel randomWord) {
+		ActionListener listenerForRandomizer = new ActionListener() {
 
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				randomWord.setText(RandomWord.word);
+				
+				try {
+					randomWord.setText(RandomWord.randomizer());
+				} catch (FileNotFoundException a) {
+					a.printStackTrace();
+				}
 			}
 		};
-		random.addActionListener(randomListener);
+		buttonForRandomizer.addActionListener(listenerForRandomizer);
 	}
 }
-
 
